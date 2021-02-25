@@ -24,6 +24,7 @@ class Solution:
         self.NUM_CARS = None
         self.BONUS = None
         self.BEST_CARS_STREET = {}
+        self.used_streets_by_cars = set()
 
     def read_input(self, file_name):
         with open(f'./input/{file_name}') as f:
@@ -49,13 +50,23 @@ class Solution:
             path_score += 1 + self.STREETS_LENS[street]
         return path_score
 
+    def pop_unused_streets(self):
+        all_streets = set(street_name for street_name in self.STREETS)
+        streets_to_remove = all_streets - self.used_streets_by_cars
+        print(f'removing streets {len(streets_to_remove)}')
+        for street_name in streets_to_remove:
+            self.STREETS_LENS.pop(street_name)
+            self.STREETS.pop(street_name)
+
     def run(self, file_name):
         self.read_input(file_name)
         for key, streets in self.CARS.items():
+            self.used_streets_by_cars.update(streets)
             path_length = self.path_length(streets)
             if path_length <= self.DURATION:
                 self.BEST_CARS_STREET[key] = path_length
 
+        self.pop_unused_streets()
         BEST_CARS = sorted(self.BEST_CARS_STREET, key=self.BEST_CARS_STREET.get)
 
         streets_to_intersection_map = {}
