@@ -1,4 +1,8 @@
+import math
 from collections import defaultdict
+import copy
+from functools import reduce
+
 
 def chunks(lst):
     for i in range(len(lst) - 1):
@@ -8,8 +12,8 @@ class Solution:
     def __init__(self) -> None:
         super().__init__()
         self.data = None
-        self.input_file_name = './input/a.txt'
-        self.output_file_name = 'main.txt'
+        self.input_file_name = './input/d.txt'
+        self.output_file_name = 'd.txt'
         self.STREETS = {}
         self.CARS = {}
         self.STREETS_LENS = {}
@@ -87,12 +91,31 @@ class Solution:
                 intersection_perf[f'{first_street}__{intersection_id}'] += 1
                 streets_by_intersection_id[intersection_id].add(first_street)
 
+
         result_data = {}
-        for CAR_ID in BEST_CARS:
-            STREETS_TO_GO = self.CARS[CAR_ID]
-            for STREET in STREETS_TO_GO:
-                street = self.STREETS[STREET]
-                result_data[street['end']] = {STREET: 1}
+        intersection_perf_ratio = {}
+        for intersection_id, streets in streets_by_intersection_id.items():
+            numbers = []
+            for street in streets:
+                numbers.append(intersection_perf[f'{street}__{intersection_id}'])
+            if len(numbers) > 2:
+                gcd = reduce(lambda x, y: math.gcd(x, y), numbers)
+            elif len(numbers) == 2:
+                gcd = math.gcd(*numbers)
+            else:
+                gcd = 1
+
+            for street in streets:
+                ratio = intersection_perf[f'{street}__{intersection_id}'] / gcd
+                intersection_perf_ratio[f'{street}__{intersection_id}'] = ratio
+                result_data[intersection_id] = {street: int(ratio)}
+
+
+        # for CAR_ID in BEST_CARS:
+        #     STREETS_TO_GO = self.CARS[CAR_ID]
+        #     for STREET in STREETS_TO_GO:
+        #         street = self.STREETS[STREET]
+        #         result_data[street['end']] = {STREET: 1}
 
         result_lines = []
         result_lines.append(str(len(result_data)))
