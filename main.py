@@ -103,7 +103,8 @@ class Solution:
             for second_street in street_by_start[data['end']]:
                 streets_to_intersection_map[f'{street_slug}__{second_street}'] = data['end']
 
-        BEST_CARS_IDS = self.get_unique_cars(BEST_CARS_IDS, streets_to_intersection_map)
+        # BEST_CARS_IDS = BEST_CARS_IDS[:5]
+        # BEST_CARS_IDS = self.get_unique_cars(BEST_CARS_IDS, streets_to_intersection_map)
 
         intersection_perf = defaultdict(lambda: 0)  # street_name__int_id
         streets_by_intersection_id = defaultdict(set)
@@ -116,7 +117,7 @@ class Solution:
                 intersection_perf[f'{first_street}__{intersection_id}'] += 1
                 streets_by_intersection_id[intersection_id].add(first_street)
 
-        result_data = {}
+        result_data = defaultdict(dict)
         intersection_perf_ratio = {}
         for intersection_id, streets in streets_by_intersection_id.items():
             numbers = []
@@ -132,7 +133,7 @@ class Solution:
             for street in streets:
                 ratio = intersection_perf[f'{street}__{intersection_id}'] / gcd
                 intersection_perf_ratio[f'{street}__{intersection_id}'] = ratio
-                result_data[intersection_id] = {street: int(ratio)}
+                result_data[intersection_id].update({street: int(ratio)})
 
         # for CAR_ID in BEST_CARS:
         #     STREETS_TO_GO = self.CARS[CAR_ID]
@@ -152,6 +153,6 @@ class Solution:
 
 
 s = Solution()
-# for file_name in ['a.txt', 'b.txt', 'c.txt', 'd.txt', 'e.txt', 'f.txt']:
-for file_name in ['d.txt']:
+for file_name in ['a.txt', 'b.txt', 'c.txt', 'd.txt', 'e.txt', 'f.txt']:
+# for file_name in ['d.txt']:
     s.run(file_name)
