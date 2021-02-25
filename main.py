@@ -41,12 +41,19 @@ class Solution:
     def run(self):
         self.read_input(self.input_file_name)
         for key, streets in self.CARS.items():
-            self.BEST_CARS_STREET[key] = self.path_length(streets)
+            path_length = self.path_length(streets)
+            if path_length <= self.DURATION:
+                self.BEST_CARS_STREET[key] = path_length
 
         result = sorted(self.BEST_CARS_STREET, key=self.BEST_CARS_STREET.get)
 
+
+        # state = {}
+        # for time in enumerate(self.DURATION):
+
+
         result_data = {}
-        for CAR_ID in result[:1]:
+        for CAR_ID in result:
             STREETS_TO_GO = self.CARS[CAR_ID]
             for STREET in STREETS_TO_GO:
                 street = self.STREETS[STREET]
