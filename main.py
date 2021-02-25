@@ -1,3 +1,9 @@
+from collections import defaultdict
+
+def chunks(lst):
+    for i in range(len(lst) - 1):
+        yield lst[i:i + 2]
+
 class Solution:
     def __init__(self) -> None:
         super().__init__()
@@ -45,15 +51,33 @@ class Solution:
             if path_length <= self.DURATION:
                 self.BEST_CARS_STREET[key] = path_length
 
-        result = sorted(self.BEST_CARS_STREET, key=self.BEST_CARS_STREET.get)
+        BEST_CARS = sorted(self.BEST_CARS_STREET, key=self.BEST_CARS_STREET.get)
 
+        streets_to_intersection_map = {}
+        street_by_start = defaultdict(list)
+        street_by_end = defaultdict(list)
+        for street_slug, data in self.STREETS.items():
+            street_by_start[data['start']].append(street_slug)
+        for street_slug, data in self.STREETS.items():
+            street_by_end[data['end']].append(street_slug)
 
-        # state = {}
-        # for time in enumerate(self.DURATION):
+        for street_slug, data in self.STREETS.items():
+            for second_street in street_by_start[data['end']]:
+                streets_to_intersection_map[f'{street_slug}__{second_street}'] = data['end']
 
+        intersection_perf = defaultdict(lambda: 0)  # street_name__int_id
+        streets_by_intersection_id = defaultdict(set)
+
+        for car_id in BEST_CARS:
+            STREETS_TO_GO = self.CARS[car_id]
+            for item in chunks(STREETS_TO_GO):
+                first_street, second_street = item
+                intersection_id = streets_to_intersection_map[f'{first_street}__{second_street}']
+                intersection_perf[f'{first_street}__{intersection_id}'] += 1
+                streets_by_intersection_id[intersection_id].add(first_street)
 
         result_data = {}
-        for CAR_ID in result:
+        for CAR_ID in BEST_CARS:
             STREETS_TO_GO = self.CARS[CAR_ID]
             for STREET in STREETS_TO_GO:
                 street = self.STREETS[STREET]
