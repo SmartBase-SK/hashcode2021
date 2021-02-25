@@ -8,6 +8,7 @@ def chunks(lst):
     for i in range(len(lst) - 1):
         yield lst[i:i + 2]
 
+
 class Solution:
     def __init__(self) -> None:
         super().__init__()
@@ -25,7 +26,7 @@ class Solution:
         self.BEST_CARS_STREET = {}
 
     def read_input(self, file_name):
-        with open(file_name) as f:
+        with open(f'./input/{file_name}') as f:
             self.data = [i.strip() for i in f.readlines()]
             line_num = 0
             self.DURATION, self.NUM_INTER, self.NUM_STREETS, self.NUM_CARS, self.BONUS = map(int, self.data[0].split(' '))
@@ -48,8 +49,8 @@ class Solution:
             path_score += 1 + self.STREETS_LENS[street]
         return path_score
 
-    def run(self):
-        self.read_input(self.input_file_name)
+    def run(self, file_name):
+        self.read_input(file_name)
         for key, streets in self.CARS.items():
             path_length = self.path_length(streets)
             if path_length <= self.DURATION:
@@ -80,7 +81,6 @@ class Solution:
                 intersection_perf[f'{first_street}__{intersection_id}'] += 1
                 streets_by_intersection_id[intersection_id].add(first_street)
 
-
         result_data = {}
         intersection_perf_ratio = {}
         for intersection_id, streets in streets_by_intersection_id.items():
@@ -99,7 +99,6 @@ class Solution:
                 intersection_perf_ratio[f'{street}__{intersection_id}'] = ratio
                 result_data[intersection_id] = {street: int(ratio)}
 
-
         # for CAR_ID in BEST_CARS:
         #     STREETS_TO_GO = self.CARS[CAR_ID]
         #     for STREET in STREETS_TO_GO:
@@ -113,9 +112,11 @@ class Solution:
             result_lines.append(str(len(streets)))
             for street_name, seconds in streets.items():
                 result_lines.append(f'{street_name} {seconds}')
-        with open(self.output_file_name, 'w') as f:
+        with open(file_name, 'w') as f:
             f.writelines('\n'.join(result_lines))
 
 
 s = Solution()
-s.run()
+# for file_name in ['a.txt', 'b.txt', 'c.txt', 'd.txt', 'e.txt', 'f.txt']:
+for file_name in ['d.txt']:
+    s.run(file_name)
