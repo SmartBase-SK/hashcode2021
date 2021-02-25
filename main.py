@@ -58,8 +58,29 @@ class Solution:
             self.STREETS_LENS.pop(street_name)
             self.STREETS.pop(street_name)
 
+    def get_unique_cars(self, car_ids, streets_to_intersection_map):
+        result = []
+        used_intersections = set()
+        for car_id in car_ids:
+            STREETS_TO_GO = self.CARS[car_id]
+            is_good = True
+            used_by_this_car = set()
+            for index, item in enumerate(chunks(STREETS_TO_GO)):
+                first_street, second_street = item
+                intersection_id = streets_to_intersection_map[f'{first_street}__{second_street}']
+                if intersection_id in used_intersections:
+                    print(f'Fail {index}: {intersection_id}')
+                    is_good = False
+                    break
+                used_by_this_car.add(intersection_id)
+            if is_good:
+                result.append(car_id)
+                used_intersections.update(used_by_this_car)
+        return result
+
     def run(self, file_name):
         self.read_input(file_name)
+
         for key, streets in self.CARS.items():
             self.used_streets_by_cars.update(streets)
             path_length = self.path_length(streets)
@@ -67,7 +88,8 @@ class Solution:
                 self.BEST_CARS_STREET[key] = path_length
 
         self.pop_unused_streets()
-        BEST_CARS = sorted(self.BEST_CARS_STREET, key=self.BEST_CARS_STREET.get)
+        BEST_CARS_IDS = sorted(self.BEST_CARS_STREET, key=self.BEST_CARS_STREET.get, reverse=True)
+        # self.CARS = {key: value for key, value in self.CARS if key in BEST_CARS_IDS}
 
         streets_to_intersection_map = {}
         street_by_start = defaultdict(list)
@@ -81,10 +103,12 @@ class Solution:
             for second_street in street_by_start[data['end']]:
                 streets_to_intersection_map[f'{street_slug}__{second_street}'] = data['end']
 
+        BEST_CARS_IDS = self.get_unique_cars(BEST_CARS_IDS, streets_to_intersection_map)
+
         intersection_perf = defaultdict(lambda: 0)  # street_name__int_id
         streets_by_intersection_id = defaultdict(set)
 
-        for car_id in BEST_CARS:
+        for car_id in BEST_CARS_IDS:
             STREETS_TO_GO = self.CARS[car_id]
             for item in chunks(STREETS_TO_GO):
                 first_street, second_street = item
